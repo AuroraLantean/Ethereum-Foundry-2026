@@ -14,4 +14,9 @@ fuzz_runs = 1_000
 [profile.ci]
 fuzz_runs = 100_000
 
+[rpc_endpoints]
+sei_testnet = "https://evm-rpc-testnet.sei-apis.com"
+sei_mainnet = "https://evm-rpc.sei-apis.com"
+
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

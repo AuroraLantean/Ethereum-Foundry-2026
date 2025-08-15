@@ -7,6 +7,10 @@ Install Foundry https://getfoundry.sh/introduction/installation/
 Follow the doc: https://getfoundry.sh/introduction/getting-started
 
 Use Sepolia network for testing smart contracts until 2027
+```
+forge install Openzeppelin/openzeppelin-contracts
+forge remappings > remappings.txt
+```
 
 ## TODO
 ERC 20, 741, 3643, 1400
@@ -14,7 +18,11 @@ ERC 20, 741, 3643, 1400
 
 ## Run Tests
 
-To run test: `forge test --match-path test/Counter.t.sol -vv`
+To run test: 
+```
+forge test -vvv
+forge test --match-path test/Counter.t.sol -vv
+```
 
 ## Environment Variables
 

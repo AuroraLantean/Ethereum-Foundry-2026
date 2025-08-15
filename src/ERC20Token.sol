@@ -44,15 +44,6 @@ contract USDX is ERC20Token {
 }
 
 interface IERC20Receiver {
-    /**
-     * @dev Whenever an {IERC20} `tokenId` token is transferred to this contract via {IERC20-safeTransferFrom}
-     * by `operator` from `from`, this function is called.
-     *
-     * It must return its Solidity selector to confirm the token transfer.
-     * If any other value is returned or the interface is not implemented by the recipient, the transfer will be reverted.
-     *
-     * The selector can be obtained in Solidity with `IERC20Receiver.tokenReceived.selector`.
-     */
     function tokenReceived(address from, uint256 amount, bytes calldata data) external returns (bytes4);
 }
 
@@ -83,7 +74,8 @@ contract ERC20Receiver is IERC20Receiver {
     }*/
 
     // If `token` returns no value, non-reverting calls are assumed to be successful.
-    function safeTransfer(address erc20Addr, address to, uint256 amount) public {
+    function withdraw(address erc20Addr, address to, uint256 amount) public {
+        require(msg.sender == owner, "not owner");
         IERC20(erc20Addr).safeTransfer(to, amount);
     }
 
@@ -94,18 +86,19 @@ contract ERC20Receiver is IERC20Receiver {
     }*/
 
     //calling contract. If `token` returns no value, non-reverting calls are assumed to be successful.
-    function safeTransferFrom(address erc20Addr, address from, uint256 amount) public {
-        IERC20(erc20Addr).safeTransferFrom(msg.sender, from, amount);
+    function deposit(address erc20Addr, uint256 amount) public {
+        IERC20(erc20Addr).safeTransferFrom(msg.sender, address(this), amount);
     }
 
     //returns a bool instead of reverting if the operation is not successful.
-    function trySafeTransfer(address erc20Addr, address to, uint256 amount) public {
+    function tryWithdraw(address erc20Addr, address to, uint256 amount) public {
+        require(msg.sender == owner, "not owner");
         IERC20(erc20Addr).trySafeTransfer(to, amount);
     }
 
     //returns a bool instead of reverting if the operation is not successful.
-    function trySafeTransferFrom(address erc20Addr, address from, uint256 amount) public {
-        IERC20(erc20Addr).trySafeTransferFrom(msg.sender, from, amount);
+    function tryDeposit(address erc20Addr, uint256 amount) public {
+        IERC20(erc20Addr).trySafeTransferFrom(msg.sender, address(this), amount);
     }
 
     /*If `token` returns no value, non-reverting calls are assumed to be successful.
@@ -122,7 +115,7 @@ contract ERC20Receiver is IERC20Receiver {
 
     IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client" smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using this function. 
     
-    Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior.     */
+    Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior. */
     function safeDecreaseAllowance(address erc20Addr, address spender, uint256 amount) public {
         IERC20(erc20Addr).safeDecreaseAllowance(spender, amount);
     }
@@ -204,10 +197,15 @@ contract ERC1363Token is Ownable, ERC1363, ERC20Burnable {
         return (symbol(), decimals(), balanceOf(target));
     }
 
+    /*
+    transfer(to, value)
+    IERC1363Receiver(to).onTransferReceived(operator=_msgSender(), from=_msgSender(), value, data)    */
     function transferAndCall(address to, uint256 value, bytes memory data) public override returns (bool) {
         return super.transferAndCall(to, value, data);
     }
 
+    /* transferFrom(from, to, value)
+    IERC1363Receiver(to).onTransferReceived(operator=_msgSender(), from, value, data) */
     function transferFromAndCall(address from, address to, uint256 value, bytes memory data)
         public
         override
@@ -216,7 +214,9 @@ contract ERC1363Token is Ownable, ERC1363, ERC20Burnable {
         return super.transferFromAndCall(from, to, value, data);
     }
 
-    //replicate USDT approval behavior in approveAndCall
+    /*replicate USDT approval behavior
+    approve(spender, value)
+    IERC1363Spender(spender).onApprovalReceived(operator=_msgSender(), value, data) to send tokens: transferFrom(owner, target, value)   */
     function approveAndCall(address spender, uint256 value, bytes memory data) public override returns (bool) {
         require(value == 0 || allowance(msg.sender, spender) == 0, "existing allowance detected");
         return super.approveAndCall(spender, value, data);
@@ -263,9 +263,8 @@ contract ERC1363Receiver is IERC1363Receiver {
         balances[from] += value;
         emit Deposit(from, beneficiary, value);
 
-        return this.onTransferReceived.selector;
-        //return _ERC1363_RECEIVED;
-        //IERC1363Receiver.onTransferReceived.selector
+        return IERC1363Receiver.onTransferReceived.selector;
+        //this.onTransferReceived.selector;
     }
 
     function withdraw(uint256 value) external {
@@ -323,10 +322,11 @@ contract ERC1363Spender is IERC1363Spender {
             revert("no target");
         }
         bool success = IERC1363(msg.sender).transferFrom(owner, target, value);
-
         require(success, "transfer failed");
 
-        return this.onApprovalReceived.selector;
-        //return IERC1363Spender.onApprovalReceived.selector;
+        IERC1363(msg.sender).approve(address(this), 0);
+
+        return IERC1363Spender.onApprovalReceived.selector;
+        //this.onApprovalReceived.selector;
     }
 }
