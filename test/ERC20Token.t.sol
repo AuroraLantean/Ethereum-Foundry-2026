@@ -63,6 +63,11 @@ contract ERC20TokenTest is Test {
         console.log("receiverAddr balc:", balc);
         assertEq(balc, tokenAmount);
 
+        b4 = erc20receiver.makeBytes();
+        console.logBytes4(b4);
+        b4 = erc20receiver.makeBytes2();
+        console.logBytes4(b4);
+
         tokenAmount = 250;
         erc20receiver.withdraw(usdtAddr, charlie, tokenAmount);
         balc = usdt.balanceOf(charlie);
@@ -93,5 +98,34 @@ contract ERC20TokenTest is Test {
         receivedAmount = usdt.balanceOf(charlie);
         console.log("receivedAmount:", receivedAmount);
         assertEq(receivedAmount, 100 * 10 ** decimals);
+    }
+
+    function testTransferFromEOA() public {
+        usdt.mint(bob, tokenAmount);
+        vm.prank(bob);
+        usdt.transfer(charlie, tokenAmount);
+        receivedAmount = usdt.balanceOf(charlie);
+        assertEq(receivedAmount, tokenAmount);
+    }
+
+    // function testFail() public { }
+
+    function testBurn() public {
+        usdt.mint(bob, tokenAmount);
+
+        //only account with enough balance can burn
+        receivedAmount = usdt.balanceOf(charlie);
+        vm.prank(charlie);
+        bytes4 selector = bytes4(keccak256("ERC20InsufficientBalance(address,uint256,uint256)"));
+        vm.expectRevert(abi.encodeWithSelector(selector, charlie, receivedAmount, tokenAmount));
+        usdt.burn(tokenAmount);
+        emit log_address(charlie);
+        emit log_address(bob);
+
+        vm.prank(bob);
+        usdt.burn(tokenAmount);
+        receivedAmount = usdt.balanceOf(bob);
+        console.log("receivedAmount:", receivedAmount);
+        assertEq(receivedAmount, 0);
     }
 }
