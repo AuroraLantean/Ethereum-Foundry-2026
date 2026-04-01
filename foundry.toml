@@ -14,7 +14,31 @@ auto_detect_remappings = true
 auto_detect_solc = true
 optimizer = true
 optimizer_runs = 200
-#eth-rpc-url = "https://mainnet.infura.io"
+eth_rpc_url = "https://ethereum.reth.rs/rpc"
+#eth_rpc_url = "https://mainnet.infura.io"
+
+#gas_reports = ["Counter", "Token"]
+#gas_reports_ignore = ["Test", "Script"]
+
+#https://www.getfoundry.sh/config/reference/formatter
+[fmt]
+line_length = 120
+tab_width = 2
+bracket_spacing = true
+int_types = "long"
+multiline_func_header = "params_first"
+quote_style = "double"
+number_underscore = "thousands"
+single_line_statement_blocks = "preserve"
+ignore = ["src/legacy/**"]
+
+[lint]
+severity = ["high", "med", "low"]
+#severity = ["high", "med"]  # Only high and medium severity; severity levels = high, med, low, info, gas, code-size
+exclude_lints = ["mixed-case-function", "asm-keccak256"]
+#"custom-errors"
+ignore = ["src/legacy/**", "test/**"]
+#Lint suppression: https://www.getfoundry.sh/forge/linting#inline-suppression
 
 [fuzz]
 runs = 1000

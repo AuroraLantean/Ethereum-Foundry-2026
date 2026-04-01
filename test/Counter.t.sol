@@ -27,4 +27,44 @@ contract CounterTest is Test {
         counter.setNumber(x);
         assertEq(counter.number(), x);
     }
+
+    //Constrainted inputs
+    function testFuzz_Transfer(uint256 amount) public {
+        amount = bound(amount, 1, 1000 ether);
+        //vm.assume(amount > 0 && amount <= 1000 ether);
+    }
+
+    function test_RevertWhen_Unauthorized() public {
+        //vm.expectRevert("Not authorized");
+        //counter.should_revert();
+        //OR
+        //vm.expectRevert(Token.InsufficientBalance.selector);
+        //token.transfer(address(0), 1000);
+    }
+
+    //test events
+    function test_EmitsTransfer() public {
+        //vm.expectEmit(true, true, false, true); //the four booleans specify which topics and data to check.
+        //emit Transfer(alice, bob, 100);
+        //token.transfer(bob, 100);
+    }
+
+    //test time
+    function test_timeTravel() public {
+        /*// Set block timestamp
+        vm.warp(1700000000);
+
+        // Set block number
+        vm.roll(18000000);
+
+        // Impersonate an address
+        vm.prank(alice);
+        contract.doSomething();
+
+        // Give ETH to an address
+        vm.deal(alice, 100 ether);
+
+        // Modify storage
+        vm.store(address(token), bytes32(0), bytes32(uint256(1000))); */
+    }
 }

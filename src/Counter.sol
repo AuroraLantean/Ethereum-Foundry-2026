@@ -11,4 +11,9 @@ contract Counter {
     function increment() public {
         number++;
     }
+
+    function should_revert() public {
+        number = 0;
+        number = number - 1;
+    }
 }

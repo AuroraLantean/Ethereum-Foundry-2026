@@ -1,4 +1,4 @@
-# EVM_Advanced
+# Ethereum Foundry 2026
 
 ## Installation
 
@@ -13,8 +13,9 @@ forge remappings > remappings.txt
 ```
 
 ## TODO
-ERC 20, 741, 3643, 1400
 
+ERC 20, 741, 3643, 1400
+Add formatting in git-precommit and CICD: <https://www.getfoundry.sh/forge/formatting#pre-commit-integration>
 
 ## Run Tests
 
