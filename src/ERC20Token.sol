@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+pragma solidity ^0.8.34;
 //=> ERC-3643, ERC-1400, ERC-1155
 
 //import "solmate/tokens/ERC20.sol";
@@ -104,8 +104,8 @@ contract ERC20Receiver is IERC20Receiver {
     /*If `token` returns no value, non-reverting calls are assumed to be successful.
 
     IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client" smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using
-    this function. 
-    
+    this function.
+
     Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior. */
     function safeIncreaseAllowance(address erc20Addr, address spender, uint256 amount) public {
         IERC20(erc20Addr).safeIncreaseAllowance(spender, amount);
@@ -113,15 +113,15 @@ contract ERC20Receiver is IERC20Receiver {
 
     /* If `token` returns no value, non-reverting calls are assumed to be successful.
 
-    IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client" smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using this function. 
-    
+    IMPORTANT: If the token implements ERC-7674 (ERC-20 with temporary allowance), and if the "client" smart contract uses ERC-7674 to set temporary allowances, then the "client" smart contract should avoid using this function.
+
     Performing a {safeIncreaseAllowance} or {safeDecreaseAllowance} operation on a token contract that has a non-zero temporary allowance (for that particular owner-spender) will result in unexpected behavior. */
     function safeDecreaseAllowance(address erc20Addr, address spender, uint256 amount) public {
         IERC20(erc20Addr).safeDecreaseAllowance(spender, amount);
     }
 
     /* If `token` returns no value,non-reverting calls are assumed to be successful. Meant to be used with tokens that require the approval to be set to zero before setting it to a non-zero value, such as USDT.
-    
+
     NOTE: If the token implements ERC-7674, this function will not modify any temporary allowance. This function only sets the "standard" allowance. Any temporary allowance will remain active, in addition to the value being set here. */
     function forceApprove(address erc20Addr, address spender, uint256 amount) public {
         IERC20(erc20Addr).forceApprove(spender, amount);
@@ -143,7 +143,9 @@ contract ERC20Receiver is IERC20Receiver {
 
     function executeTxn(address _ctrt, uint256 _value, bytes calldata _data) public {
         //console.log("executeTxn()...", _data, msg.value);
-        (bool success, /*bytes memory _databk*/ ) = _ctrt.call{value: _value}(_data);
+        (
+            bool success, /*bytes memory _databk*/
+        ) = _ctrt.call{value: _value}(_data);
         //console.logBytes(_databk);
         require(success, "tx failed");
     }
@@ -293,7 +295,7 @@ contract ERC1363Receiver is IERC1363Receiver {
     }
 
     /* Performs an {ERC1363} approveAndCall, with a fallback to the simple {ERC20} approve if the target has no code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when targeting contracts.
-    
+
     NOTE: When the recipient address (`to`) has no code (i.e. is an EOA), this function behaves as {forceApprove}.
     Opposedly, when the recipient address (`to`) has code, this function only attempts to call {ERC1363-approveAndCall}
     once without retrying, and relies on the returned value to be true.
