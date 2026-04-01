@@ -1,34 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.34;
 
-import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import { Script, console } from "forge-std/Script.sol";
+import { Counter } from "../src/Counter.sol";
 
 contract CounterScript is Script {
-    Counter public counter;
+  Counter public counter;
+  address alice;
+  address bob;
 
-    function setUp() public {
-        //Label addresses for easier debugging
-        alice = makeAddr("alice");
-        bob = makeAddr("bob");
+  function setUp() public {
+    //Label addresses for easier debugging
+    alice = makeAddr("alice");
+    bob = makeAddr("bob");
 
-        //vm.label(address(token), "Token");
-        //vm.label(address(pool), "Pool");
-    }
+    //vm.label(address(token), "Token");
+    //vm.label(address(pool), "Pool");
+  }
 
-    //run() must exists
-    function run() public {
-        vm.startBroadcast();
-        //vm.startBroadcast(deployerAddress);
-        //OR
-        //uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
-        //vm.startBroadcast(deployerPrivateKey);
+  //run() must exists
+  function run() public {
+    vm.startBroadcast();
+    //vm.startBroadcast(deployerAddress);
+    //OR
+    //uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+    //vm.startBroadcast(deployerPrivateKey);
 
-        counter = new Counter();
-        //counter.setNumber(42);
+    counter = new Counter();
+    //counter.setNumber(42);
 
-        vm.stopBroadcast();
-    }
+    vm.stopBroadcast();
+  }
 }
 /*// Read environment variables
 string memory rpcUrl = vm.envString("RPC_URL");
