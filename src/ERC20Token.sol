@@ -349,7 +349,7 @@ contract ERC1363Receiver is IERC1363Receiver {
     require(balances[msg.sender] >= value, "balance too low");
     balances[msg.sender] -= value;
 
-    IERC1363(erc1363Token).transfer(msg.sender, value);
+    require(IERC1363(erc1363Token).transfer(msg.sender, value), "result");
   }
 
   /* Performs an {ERC1363} transferAndCall, with a fallback to the simple {ERC20} transfer if the target has no code. This can be used to implement an {ERC721}-like safe transfer that rely on {ERC1363} checks when targeting contracts.

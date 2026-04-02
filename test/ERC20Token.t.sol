@@ -19,6 +19,7 @@ contract ERC20TokenTest is Test {
   uint256 public tokenAmount = 1000;
   uint256 public receivedAmount = 0;
   bytes4 public b4;
+  bool public boo = false;
 
   receive() external payable {
     console.log("ETH received from:", msg.sender);
@@ -107,7 +108,8 @@ contract ERC20TokenTest is Test {
   function testTransferFromEOA() public {
     usdt.mint(bob, tokenAmount);
     vm.prank(bob);
-    usdt.transfer(charlie, tokenAmount);
+    boo = usdt.transfer(charlie, tokenAmount);
+    assert(boo);
     receivedAmount = usdt.balanceOf(charlie);
     assertEq(receivedAmount, tokenAmount);
   }

@@ -1,29 +1,23 @@
 # Ethereum Foundry 2026
 
-## Installation
-
-Install Foundry https://getfoundry.sh/introduction/installation/
-
-Follow the doc: https://getfoundry.sh/introduction/getting-started
-
-Use Sepolia network for testing smart contracts until 2027
-```
-forge install Openzeppelin/openzeppelin-contracts
-forge remappings > remappings.txt
-```
-
 ## TODO
 
 ERC 20, 741, 3643, 1400
 Add formatting in git-precommit and CICD: <https://www.getfoundry.sh/forge/formatting#pre-commit-integration>
 
-## Run Tests
+## Installation
 
-To run test: 
+Install Foundry: <https://getfoundry.sh/introduction/installation/>
+
+Follow the doc: <https://getfoundry.sh/introduction/getting-started>
+
+Use Sepolia network for testing smart contracts until 2027
+```bash
+forge install Openzeppelin/openzeppelin-contracts
+forge remappings > remappings.txt
 ```
-forge test -vvv
-forge test --match-path test/Counter.t.sol -vv
-```
+
+Fix VS Code linting: <https://ethereum.stackexchange.com/questions/142459/forge-std-test-sol-imported-and-working-but-vscode-marks-an-error>
 
 ## Environment Variables
 
@@ -33,7 +27,7 @@ Make `.env` file from `.env.example`.
 
 Then fill out the following in that .env file:
 
-```
+```env
 MAINNET_RPC_URL=
 SEPOLIA_RPC_URL=
 GOERLI_RPC_URL=
@@ -52,3 +46,20 @@ PRIVATE_KEY=
 ANVIL4=
 ANVIL4_PRIVATE_KEY=
 ```
+
+## Run Tests
+
+```bash
+forge test -vvv
+forge test --match-path test/Counter.t.sol -vv
+```
+
+## Deploy Contracts
+
+Deploy the USDX(ERC20), ERC721, and the ERC721 Sales smart contracts onto the Anvil Local Ethereum network:
+
+```bash
+forge script script/LocalDeploymt.s.sol:AnvilDeploymtScript --fork-url $ANVIL_RPC --broadcast -vvvv; echo erc721sales_makeabi
+```
+
+Copy the compiled Solidity ABI files with deployment contract addresses into this frontend project repository: `bun run erc721sales_makeabi
