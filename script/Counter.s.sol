@@ -4,6 +4,7 @@ pragma solidity ^0.8.34;
 import { Script, console } from "forge-std/Script.sol";
 import { Counter } from "../src/Counter.sol";
 
+// contract name below must be $Filename+Script
 contract CounterScript is Script {
   Counter public counter;
   address alice;
