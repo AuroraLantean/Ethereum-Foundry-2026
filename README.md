@@ -2,7 +2,7 @@
 
 ## TODO
 
-ERC 20, 741, 3643, 1400
+ERC 741, 3643, 1400
 Add formatting in git-precommit and CICD: <https://www.getfoundry.sh/forge/formatting#pre-commit-integration>
 
 ## Installation
@@ -56,10 +56,11 @@ forge test --match-path test/Counter.t.sol -vv
 
 ## Deploy Contracts
 
-Deploy the USDX(ERC20), ERC721, and the ERC721 Sales smart contracts onto the Anvil Local Ethereum network:
+Deploy the USDX(ERC20), ERC721, and the ERC721 Sales smart contracts onto the Anvil Local Ethereum network, then extract ABIs into out_abi:
 
 ```bash
-forge script script/LocalDeploymt.s.sol:AnvilDeploymtScript --fork-url $ANVIL_RPC --broadcast -vvvv; echo erc721sales_makeabi
+forge script script/Deploy.s.sol:DeployScript --fork-url --sig "run(uint256)" 5 --rpc-url http://localhost:8545 --broadcast
+bun abiExtract.ts
 ```
 
 Copy the compiled Solidity ABI files with deployment contract addresses into this frontend project repository: `bun run erc721sales_makeabi

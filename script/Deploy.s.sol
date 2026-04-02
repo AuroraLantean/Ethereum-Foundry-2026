@@ -155,10 +155,17 @@ contract DeployScript is Script {
 
       //nftBalc = dragons.balanceOf(tis);
       //console.log("tis nftBalc:", nftBalc);
-      console.log("deployer:", deployer);
+      console.log("deployer=", deployer);
       console.log("USDT_ADDR=", usdxAddr);
       console.log("DRAGONS_ADDR=", nftAddr);
       console.log("SALES_ADDR=", salesAddr);
+
+      console.log("");
+      console.log("copy and paste below to deployAddrRaw.txt");
+      console.log("{##Deployer##:#", deployer, "#");
+      console.log("##USDT_ADDR##:#", usdxAddr, "#");
+      console.log("##DRAGONS_ADDR##:#", nftAddr, "#");
+      console.log("##SALES_ADDR##:#", salesAddr, "#}");
     }
     vm.stopBroadcast();
   }
