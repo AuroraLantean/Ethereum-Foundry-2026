@@ -14,7 +14,7 @@ pragma solidity ^0.8.34;
  *   https://book.getfoundry.sh/reference/anvil/
  */
 
-import { Script, console } from "forge-std/Script.sol";
+import "forge-std/Script.sol";
 import { Counter } from "../src/Counter.sol";
 
 // contract name below must be $Filename+Script
@@ -23,6 +23,11 @@ contract CounterScript is Script {
   Counter public counter;
   address alice;
   address bob;
+  //keep variables here to reduce stack variables
+  uint256 number = 0;
+  //bool bool1 = false;
+  //uint256 zGenBf;
+  //uint256 zGenAf;
 
   function setUp() public {
     //Label addresses for easier debugging
@@ -40,19 +45,13 @@ contract CounterScript is Script {
     console.log("run(). scenario:", scenario);
     //uint256 pkey = vm.envUint("PRIVATE_KEY");
     uint256 pkey = vm.envUint("ANVIL0_PRIVATE_KEY");
-
     address deployer = vm.rememberKey(pkey);
     console.log("deployer:", deployer);
 
     vm.startBroadcast(deployer); //or prvkey
     uint256 balc = address(deployer).balance;
-    console.log("balc:", balc);
+    console.log("deployer balc:", balc);
 
-    //keep variables here to reduce stack variables
-    uint256 number = 0;
-    bool bool1 = false;
-    uint256 zGenBf;
-    uint256 zGenAf;
     if (scenario == 0) {
       // deploy a contract
       counter = new Counter(); //(arg1, arg2, ..)
@@ -64,7 +63,7 @@ contract CounterScript is Script {
       console.log("number:", number);
     } else if (scenario == 1) {
       // use a deployed contract
-      Counter counter = Counter(0x5FbDB2315678afecb367f032d93F642f64180aa3);
+      counter = Counter(0x5FbDB2315678afecb367f032d93F642f64180aa3);
       number = counter.number();
       console.log("number:", number);
     }

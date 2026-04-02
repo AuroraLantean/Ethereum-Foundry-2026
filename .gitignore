@@ -13,4 +13,5 @@ zz*
 justfile
 aarchives
 accountclones
-makeabiERC721sales.ts
+abi*.ts
+out_abi/

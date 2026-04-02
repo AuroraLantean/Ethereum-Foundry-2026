@@ -309,7 +309,7 @@ contract ERC1363Receiver is IERC1363Receiver {
 
   mapping(address user => uint256 balance) public balances;
 
-  event Deposit(address indexed from, address indexed beneficiary, uint256 value);
+  event Deposit(address indexed operator, address indexed from, address indexed beneficiary, uint256 value);
 
   //bytes4 private constant _ERC1363_RECEIVED = 0x88a7ca5c;
   /* Whenever ERC-1363 tokens are transferred to this contract via `transferAndCall` or `transferFromAndCall`
@@ -337,7 +337,7 @@ contract ERC1363Receiver is IERC1363Receiver {
       beneficiary = from;
     }
     balances[from] += value;
-    emit Deposit(from, beneficiary, value);
+    emit Deposit(operator, from, beneficiary, value);
 
     return IERC1363Receiver.onTransferReceived.selector;
     //this.onTransferReceived.selector;
