@@ -26,7 +26,7 @@ contract DeployScript is Script {
   address bob;
   //keep variables here to reduce stack variables
   address deployer;
-  address adam;
+  //address adam;
   address usdxAddr;
   address nftAddr;
   uint256 balcBf;
@@ -36,14 +36,12 @@ contract DeployScript is Script {
   uint256[] public pricesEth;
   uint256[] public pricesTok;
   /*For Arbitrum, convert some ETH into Arbitrum ETH: https://bridge.arbitrum.io/?l2ChainId=421613 https://goerli.arbiscan.io */
-  address walletPbk0 = vm.envAddress("WALLET_PBK0");
+  //address walletPbk0 = vm.envAddress("WALLET_PBK0");
 
   function setUp() public {
     alice = makeAddr("alice");
     bob = makeAddr("bob");
     //vm.label(address(token), "Token");
-    //vm.label(address(pool), "Pool");
-    console.log("walletPbk0:", walletPbk0);
   }
 
   //run() must exists
@@ -51,44 +49,43 @@ contract DeployScript is Script {
     uint256 scenario
   ) public {
     console.log("run(). scenario:", scenario);
-    uint256 pkey0 = vm.envUint("ANVIL0_PRIVATE_KEY");
-    deployer = vm.rememberKey(pkey0);
+
+    deployer = msg.sender; //vm.rememberKey(pkey0); set by --sender sender if it exists
     console.log("deployer:", deployer);
 
-    uint256 pkey1 = vm.envUint("ANVIL1_PRIVATE_KEY");
-    adam = vm.rememberKey(pkey1);
-    console.log("deployer:", deployer);
+    //uint256 pkey1 = vm.envUint("ANVIL1_PRIVATE_KEY");
+    //adam = vm.rememberKey(pkey1);
 
-    vm.startBroadcast(deployer);
+    vm.startBroadcast();
     balcBf = address(deployer).balance;
     console.log("deployer balc:", balcBf);
 
     if (scenario == 0) {
+      console.log("nothing to deploy");
+    } else if (scenario == 1) {
       console.log("deploy GoldCoin");
       ERC20Token goldtoken = new ERC20Token("GoldCoin", "GOLC");
       console.log("GoldCoin addr:", address(goldtoken));
       balcBf = goldtoken.balanceOf(deployer);
       console.log("deployer GoldCoin balc:", balcBf, balcBf / 1e18);
-    } else if (scenario == 1) {
+    } else if (scenario == 2) {
       console.log("deploy ERC721 as dragons");
       ERC721Token dragons = new ERC721Token("DragonsNFT", "DRAG", minNftId, maxNftId);
       nftAddr = address(dragons);
       balcBf = dragons.balanceOf(deployer);
       console.log("deployer NFT balc:", balcBf);
-    } else if (scenario == 2) {
+    } else if (scenario == 3) {
       console.log("deploy USDX as USDT");
       USDX usdt = new USDX("TetherUSD", "USDT");
       usdxAddr = address(usdt);
       console.log("USDT addr:", usdxAddr);
       balcBf = usdt.balanceOf(deployer);
       console.log("deployer USDT balc:", balcBf, balcBf / 1e6);
-    } else if (scenario == 3) {
+    } else if (scenario == 4) {
       console.log("deploy ArrayOfStructs");
       ArrayOfStructs ctrt = new ArrayOfStructs(100);
       address ctrtAddr = address(ctrt);
       console.log("arrayOfStructsJSON addr:", ctrtAddr);
-    } else if (scenario == 4) {
-      console.log("nothing");
     } else if (scenario == 5) {
       console.log("deploy USDX, ERC721, and NftSales...");
       balcBf = deployer.balance;
@@ -158,17 +155,17 @@ contract DeployScript is Script {
       console.log("SALES_ADDR=", salesAddr);
 
       console.log("");
-      payable(walletPbk0).transfer(1 ether);
-      balcBf = address(walletPbk0).balance;
-      console.log("walletPbk0 balc:", balcBf, balcBf / 1e18);
-      usdt.transfer(walletPbk0, 999e6);
-      balcBf = usdt.balanceOf(walletPbk0);
-      console.log("walletPbk0 USDT balc:", balcBf, balcBf / 1e6);
+      // payable(walletPbk0).transfer(1 ether);
+      // balcBf = address(walletPbk0).balance;
+      // console.log("walletPbk0 balc:", balcBf, balcBf / 1e18);
+      // usdt.transfer(walletPbk0, 9000e6);
+      // balcBf = usdt.balanceOf(walletPbk0);
+      // console.log("walletPbk0 USDT balc:", balcBf, balcBf / 1e6);
 
-      console.log("adam:", adam);
-      usdt.transfer(adam, 9001e6);
-      balcBf = usdt.balanceOf(adam);
-      console.log("adam USDT balc:", balcBf, balcBf / 1e6);
+      // console.log("adam:", adam);
+      // usdt.transfer(adam, 9001e6);
+      // balcBf = usdt.balanceOf(adam);
+      // console.log("adam USDT balc:", balcBf, balcBf / 1e6);
 
       console.log("");
       console.log("copy and paste below to deployAddrRaw.txt, then run 'just abiExtract'");
