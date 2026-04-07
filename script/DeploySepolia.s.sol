@@ -20,15 +20,16 @@ import "src/ERC20Token.sol";
 import "src/ERC721Token.sol";
 import "src/ERC721Sales.sol";
 
-contract DeployAnvilScript is Script {
+contract DeploySepoliaScript is Script {
   //address public tis = address(this);
   address alice;
   address bob;
   //keep variables here to reduce stack variables
   address deployer;
   //address adam;
-  address usdxAddr;
-  address nftAddr;
+  address usdxAddr = address(0x24872ab3CEeC9dFb24C173F3230Bc1171d98EB3b);
+  address dragonsAddr = address(0x5E35Da01DA78E57e91e5013373aaC053b2463846);
+  address salesAddr = address(0xaB202C6d7494aD14562e9117d33E835C5612c6dD);
   uint256 balcBf;
   uint256 minNftId = 0;
   uint256 maxNftId = 9;
@@ -39,8 +40,8 @@ contract DeployAnvilScript is Script {
   //address walletPbk0 = vm.envAddress("WALLET_PBK0");
 
   function setUp() public {
-    alice = makeAddr("alice");
-    bob = makeAddr("bob");
+    //alice = makeAddr("alice");
+    //bob = makeAddr("bob");
     //vm.label(address(token), "Token");
   }
 
@@ -64,67 +65,37 @@ contract DeployAnvilScript is Script {
 
     if (scenario == 0) {
       console.log("nothing to deploy");
-    } else if (scenario == 1) {
+    } else if (scenario == 10) {
       console.log("deploy USDX as USDT");
       USDX usdt = new USDX("TetherUSD", "USDT");
       usdxAddr = address(usdt);
       console.log("USDT addr:", usdxAddr);
       balcBf = usdt.balanceOf(deployer);
       console.log("deployer USDT balc:", balcBf, balcBf / 1e6);
-    } else if (scenario == 2) {
+    } else if (scenario == 11) {
       console.log("deploy ERC721 as dragons");
       ERC721Token dragons = new ERC721Token("DragonsNFT", "DRAG", minNftId, maxNftId);
-      nftAddr = address(dragons);
+      dragonsAddr = address(dragons);
       balcBf = dragons.balanceOf(deployer);
       console.log("deployer NFT balc:", balcBf);
-
-      // dragons.setBaseURI("https://abc.com/");
-      // console.log("baseURI: ", dragons.baseURI());
-      // console.log("token0 URI: ", dragons.tokenURI(minNftId));
-    } else if (scenario == 3) {
-      console.log("deploy GoldCoin");
-      ERC20Token goldtoken = new ERC20Token("GoldCoin", "GOLC");
-      console.log("GoldCoin addr:", address(goldtoken));
-      balcBf = goldtoken.balanceOf(deployer);
-      console.log("deployer GoldCoin balc:", balcBf, balcBf / 1e18);
-    } else if (scenario == 4) {
-      console.log("deploy ArrayOfStructs");
-      ArrayOfStructs ctrt = new ArrayOfStructs(100);
-      address ctrtAddr = address(ctrt);
-      console.log("arrayOfStructsJSON addr:", ctrtAddr);
-    } else if (scenario == 5) {
+    } else if (scenario == 12) {
       ERC721Sales sales = new ERC721Sales(usdxAddr);
-      address salesAddr = address(sales);
+      salesAddr = address(sales);
       console.log("Sales addr:", salesAddr);
-    } else if (scenario == 6) {
-      console.log("nothing to deploy");
-    } else if (scenario == 7) {
-      console.log("deploy USDX, ERC721, and NftSales...");
-      USDX usdt = new USDX("TetherUSD", "USDT");
-      usdxAddr = address(usdt);
-      console.log("USDT addr:", usdxAddr);
-      balcBf = usdt.balanceOf(deployer);
-      console.log("deployer USDT balc:", balcBf, balcBf / 1e6);
 
-      ERC721Token dragons = new ERC721Token("DragonsNFT", "DRAG", minNftId, maxNftId);
-      nftAddr = address(dragons);
-      console.log("DragonsNFT addr:", nftAddr);
-      balcBf = dragons.balanceOf(deployer);
-      console.log("deployer NFT balc:", balcBf);
-
+      uint256[] memory out = sales.getBalances(usdxAddr, dragonsAddr);
+      console.log("getBalances() from deployer: sender ETH and Token balc, decimal");
+      console.log(out[0], out[1], out[2]);
+    } else if (scenario == 21) {
+      //just set-sepolia 21
+      ERC721Token dragons = ERC721Token(dragonsAddr);
+      console.log("baseURI: ", dragons.baseURI());
       dragons.setBaseURI("https://abc.com/");
       console.log("baseURI: ", dragons.baseURI());
       console.log("token0 URI: ", dragons.tokenURI(minNftId));
-
-      ERC721Sales sales = new ERC721Sales(usdxAddr);
-      address salesAddr = address(sales);
-      console.log("Sales addr:", salesAddr);
-
-      uint256[] memory out = sales.getBalances(usdxAddr, nftAddr);
-      console.log("getBalances() from deployer: sender ETH and Token balc, decimal");
-      console.log(out[0], out[1], out[2]);
-      /* 0: uint256[]: out 9999975238569100584676,9000000000000000,10,0,0,0,6 */
-
+    } else if (scenario == 22) {
+      ERC721Sales sales = ERC721Sales(payable(salesAddr));
+      ERC721Token dragons = ERC721Token(dragonsAddr);
       dragons.safeApproveBatch(salesAddr, minNftId, maxNftId);
       console.log("safeApproveBatch done");
 
@@ -141,46 +112,16 @@ contract DeployAnvilScript is Script {
         pricesTok.push((100 + i) * 1e6);
       }
       console.log("setPriceBatch ETH");
-      sales.setPriceBatch(nftAddr, minNftId, maxNftId, true, pricesEth);
+      sales.setPriceBatch(dragonsAddr, minNftId, maxNftId, true, pricesEth);
 
       console.log("setPriceBatch Token");
-      sales.setPriceBatch(nftAddr, minNftId, maxNftId, false, pricesTok);
+      sales.setPriceBatch(dragonsAddr, minNftId, maxNftId, false, pricesTok);
 
       console.log("Show prices in ETH and Token");
       for (uint256 i = minNftId; i <= maxNftId; i++) {
-        (uint256 priceEth, uint256 priceTok) = sales.prices(nftAddr, i);
+        (uint256 priceEth, uint256 priceTok) = sales.prices(dragonsAddr, i);
         console.log(priceEth, priceTok);
       }
-      //uint256 priceInWeiEth = 1e15;
-      //uint256 tokenDp = 1e6;
-      //uint256 priceInWeiToken = 100 * 1e6;
-
-      //nftBalc = dragons.balanceOf(tis);
-      //console.log("tis nftBalc:", nftBalc);
-      console.log("deployer=", deployer);
-      console.log("USDT_ADDR=", usdxAddr);
-      console.log("DRAGONS_ADDR=", nftAddr);
-      console.log("SALES_ADDR=", salesAddr);
-
-      console.log("");
-      // payable(walletPbk0).transfer(1 ether);
-      // balcBf = address(walletPbk0).balance;
-      // console.log("walletPbk0 balc:", balcBf, balcBf / 1e18);
-      // usdt.transfer(walletPbk0, 9000e6);
-      // balcBf = usdt.balanceOf(walletPbk0);
-      // console.log("walletPbk0 USDT balc:", balcBf, balcBf / 1e6);
-
-      // console.log("adam:", adam);
-      // usdt.transfer(adam, 9001e6);
-      // balcBf = usdt.balanceOf(adam);
-      // console.log("adam USDT balc:", balcBf, balcBf / 1e6);
-
-      console.log("");
-      console.log("copy and paste below to ctrtsTempRaw.txt, then run 'just abiExtract'");
-      console.log("{##Deployer##:#", deployer, "#");
-      console.log("##USDT_ADDR##:#", usdxAddr, "#");
-      console.log("##DRAGONS_ADDR##:#", nftAddr, "#");
-      console.log("##SALES_ADDR##:#", salesAddr, "#}");
     }
     vm.stopBroadcast();
   }
