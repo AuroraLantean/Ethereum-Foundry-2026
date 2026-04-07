@@ -20,7 +20,7 @@ import "src/ERC20Token.sol";
 import "src/ERC721Token.sol";
 import "src/ERC721Sales.sol";
 
-contract DeployScript is Script {
+contract DeployAnvilScript is Script {
   //address public tis = address(this);
   address alice;
   address bob;
@@ -52,6 +52,8 @@ contract DeployScript is Script {
 
     deployer = msg.sender; //vm.rememberKey(pkey0); set by --sender sender if it exists
     console.log("deployer:", deployer);
+    balcBf = deployer.balance;
+    console.log("deployer ETH balc:", balcBf, balcBf / 1e18);
 
     //uint256 pkey1 = vm.envUint("ANVIL1_PRIVATE_KEY");
     //adam = vm.rememberKey(pkey1);
@@ -63,35 +65,41 @@ contract DeployScript is Script {
     if (scenario == 0) {
       console.log("nothing to deploy");
     } else if (scenario == 1) {
-      console.log("deploy GoldCoin");
-      ERC20Token goldtoken = new ERC20Token("GoldCoin", "GOLC");
-      console.log("GoldCoin addr:", address(goldtoken));
-      balcBf = goldtoken.balanceOf(deployer);
-      console.log("deployer GoldCoin balc:", balcBf, balcBf / 1e18);
-    } else if (scenario == 2) {
-      console.log("deploy ERC721 as dragons");
-      ERC721Token dragons = new ERC721Token("DragonsNFT", "DRAG", minNftId, maxNftId);
-      nftAddr = address(dragons);
-      balcBf = dragons.balanceOf(deployer);
-      console.log("deployer NFT balc:", balcBf);
-    } else if (scenario == 3) {
       console.log("deploy USDX as USDT");
       USDX usdt = new USDX("TetherUSD", "USDT");
       usdxAddr = address(usdt);
       console.log("USDT addr:", usdxAddr);
       balcBf = usdt.balanceOf(deployer);
       console.log("deployer USDT balc:", balcBf, balcBf / 1e6);
+    } else if (scenario == 2) {
+      console.log("deploy ERC721 as dragons");
+      ERC721Token dragons = new ERC721Token("DragonsNFT", "DRAG", minNftId, maxNftId);
+      nftAddr = address(dragons);
+      balcBf = dragons.balanceOf(deployer);
+      console.log("deployer NFT balc:", balcBf);
+
+      // dragons.setBaseURI("https://abc.com/");
+      // console.log("baseURI: ", dragons.baseURI());
+      // console.log("token0 URI: ", dragons.tokenURI(minNftId));
+    } else if (scenario == 3) {
+      console.log("deploy GoldCoin");
+      ERC20Token goldtoken = new ERC20Token("GoldCoin", "GOLC");
+      console.log("GoldCoin addr:", address(goldtoken));
+      balcBf = goldtoken.balanceOf(deployer);
+      console.log("deployer GoldCoin balc:", balcBf, balcBf / 1e18);
     } else if (scenario == 4) {
       console.log("deploy ArrayOfStructs");
       ArrayOfStructs ctrt = new ArrayOfStructs(100);
       address ctrtAddr = address(ctrt);
       console.log("arrayOfStructsJSON addr:", ctrtAddr);
     } else if (scenario == 5) {
+      ERC721Sales sales = new ERC721Sales(usdxAddr);
+      address salesAddr = address(sales);
+      console.log("Sales addr:", salesAddr);
+    } else if (scenario == 6) {
+      console.log("nothing to deploy");
+    } else if (scenario == 7) {
       console.log("deploy USDX, ERC721, and NftSales...");
-      balcBf = deployer.balance;
-      console.log("deployer:", deployer);
-      console.log("deployer ETH balc:", balcBf, balcBf / 1e18);
-
       USDX usdt = new USDX("TetherUSD", "USDT");
       usdxAddr = address(usdt);
       console.log("USDT addr:", usdxAddr);
@@ -113,7 +121,7 @@ contract DeployScript is Script {
       console.log("Sales addr:", salesAddr);
 
       uint256[] memory out = sales.getBalances(usdxAddr, nftAddr);
-      console.log("getBalances() from deployer: [sender ETH Balc, Token balc and decimal]...");
+      console.log("getBalances() from deployer: sender ETH and Token balc, decimal");
       console.log(out[0], out[1], out[2]);
       /* 0: uint256[]: out 9999975238569100584676,9000000000000000,10,0,0,0,6 */
 
